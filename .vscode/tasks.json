@@ -1,0 +1,45 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Bananas: Init Docker Container",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/init.sh",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "shared" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Bananas: Build",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/build.sh",
+      "group": { "kind": "build", "isDefault": true },
+      "presentation": { "reveal": "always", "panel": "shared" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Bananas: Clean",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/build.sh clean",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "shared" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Bananas: Play",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/play.sh",
+      "group": "test",
+      "presentation": { "reveal": "always", "panel": "shared" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Bananas: Build & Play",
+      "dependsOrder": "sequence",
+      "dependsOn": ["Bananas: Build", "Bananas: Play"],
+      "group": "test",
+      "presentation": { "reveal": "always", "panel": "shared" },
+      "problemMatcher": []
+    }
+  ]
+}

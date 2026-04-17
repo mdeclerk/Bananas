@@ -1,0 +1,21 @@
+# Build output
+build/
+
+# GBDK intermediate files
+*.o
+*.lst
+*.sym
+*.map
+*.cdb
+*.ihx
+*.noi
+
+# macOS
+.DS_Store
+
+# editors
+.vscode/
+.idea/
+*.swp
+
+.venv/
