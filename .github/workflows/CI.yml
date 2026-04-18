@@ -11,7 +11,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Build Docker image (bananas-buildenv)
         run: bash scripts/init.sh
@@ -25,7 +25,7 @@ jobs:
           # Nintendo logo magic byte at 0x0104 — proves cart header is well-formed
           xxd -s 0x104 -l 1 build/bananas.gb | grep -q "ce"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: bananas-gb
           path: build/bananas.gb
@@ -37,9 +37,9 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: bananas-gb
           path: build
