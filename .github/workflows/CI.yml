@@ -29,3 +29,26 @@ jobs:
         with:
           name: bananas-gb
           path: build/bananas.gb
+
+  release:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: bananas-gb
+          path: build
+
+      - name: Publish rolling "latest" release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete latest --yes --cleanup-tag 2>/dev/null || true
+          gh release create latest build/bananas.gb \
+            --title "Latest build" \
+            --notes "Built from commit ${GITHUB_SHA::7} on $(date -u +%Y-%m-%d)"
