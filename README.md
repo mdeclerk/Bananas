@@ -1,6 +1,6 @@
-# Bananas
-
 [![CI](https://github.com/mdeclerk/Bananas/actions/workflows/CI.yml/badge.svg)](https://github.com/mdeclerk/Bananas/actions/workflows/CI.yml)
+
+# Bananas
 
 A 2-player artillery game for the original Game Boy (DMG), inspired by the classic [Gorillas (1991)](https://en.wikipedia.org/wiki/Gorillas_(video_game)). Two kongs, randomized & destructible terrain, ballistic bananas.
 
@@ -10,12 +10,17 @@ A 2-player artillery game for the original Game Boy (DMG), inspired by the class
   <img src="docs/image2.png" alt="Gameplay" width="360">
 </p>
 
+## TL;DR
+
+Download the latest release ROM from [bananas.gb](https://github.com/mdeclerk/Bananas/releases/latest) and run with [SameBoy](https://sameboy.github.io/).
+
+
 ## Getting Started
 
 ```sh
 ./scripts/init.sh     # one-time Docker build env setup
 ./scripts/build.sh    # compile → build/bananas.gb
-./scripts/play.sh     # launch SameBoy (or mGBA)
+./scripts/play.sh     # launch SameBoy
 ```
 
 All scripts are also available as VS Code tasks via **Terminal → Run Task** (Init, Build, Clean, Play, Build & Play).
@@ -25,16 +30,13 @@ All scripts are also available as VS Code tasks via **Terminal → Run Task** (I
 **Controls** — D-pad: aim · A: fire · B: peek at opponent
 
 <p align="center">
-  <img src="docs/gameplay.gif" alt="Gameplay demo" width="336">
+  <img src="docs/gameplay-subtitled.gif" alt="Gameplay demo" width="336">
 </p>
 
 ## Prerequisites
 
 - Docker (containerized build environment)
 - [SameBoy](https://sameboy.github.io/) (GameBoy emulator)
-- macOS, Linux, or WSL. Apple Silicon supported (Dockerfile auto-selects arm64 GBDK).
-
-Inside the container: GBDK-2020 4.5.0, `lcc`/SDCC, `png2asset`, `make`.
 
 ## Project Structure
 
