@@ -76,6 +76,30 @@ static void update_state_aim(game_t *self) {
     }
 }
 
+static void update_state_peek(game_t *self) {
+    if (!input_held(J_B)) {
+        viewport_pan_anim(&self->viewport, player_viewport_target(&self->players[self->active_player]));
+    }
+
+    if (input_pressed(J_B)) {
+        uint8_t target_idx = self->active_player ^ 1;
+        viewport_pan_anim(&self->viewport, player_viewport_target(&self->players[target_idx]));
+    }
+
+    bool panning = viewport_update_pan_anim(&self->viewport);
+    if (panning) {
+        terrain_update_view(&self->terrain, &self->viewport);
+        player_update_view(&self->players[0], &self->viewport);
+        player_update_view(&self->players[1], &self->viewport);
+        return;
+    }
+
+    if (input_held(J_B)) return;
+
+    self->state = STATE_AIM;
+    crosshair_update_view(&self->players[self->active_player], &self->viewport);
+}
+
 static void update_state_fire(game_t *self) {
     uint8_t target_player = self->active_player ^ 1;
     player_t *target = &self->players[target_player];
@@ -160,28 +184,6 @@ static void update_state_miss(game_t *self) {
     self->active_player ^= 1;
     self->state = STATE_PAN_CAM;
     viewport_pan_anim(&self->viewport, player_viewport_target(&self->players[self->active_player]));
-}
-
-static void update_state_peek(game_t *self) {
-    if (!input_held(J_B)) {
-        /* B released — redirect pan to active player immediately */
-        viewport_pan_anim(&self->viewport, player_viewport_target(&self->players[self->active_player]));
-    }
-
-    bool panning = viewport_update_pan_anim(&self->viewport);
-    if (panning) {
-        terrain_update_view(&self->terrain, &self->viewport);
-        player_update_view(&self->players[0], &self->viewport);
-        player_update_view(&self->players[1], &self->viewport);
-        return;
-    }
-
-    /* Pan finished — if B still held, stay put at opponent */
-    if (input_held(J_B)) return;
-
-    /* Arrived back at active player */
-    self->state = STATE_AIM;
-    crosshair_update_view(&self->players[self->active_player], &self->viewport);
 }
 
 static void update_state_pan_cam(game_t *self) {
