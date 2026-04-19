@@ -2,7 +2,7 @@
 
 # Bananas
 
-A 2-player artillery game for the original Game Boy (DMG), inspired by the classic [Gorillas (1991)](https://en.wikipedia.org/wiki/Gorillas_(video_game)). Two kongs, randomized & destructible terrain, ballistic bananas.
+A 2-player artillery game for the original Game Boy (DMG), inspired by the classic [Gorillas (1991)](https://en.wikipedia.org/wiki/Gorillas_(video_game)). Two kongs, destructible terrain with random layout, ballistic bananas.
 
 <p align="center">
   <img src="docs/image1.png" alt="Title screen" width="360">
@@ -12,7 +12,7 @@ A 2-player artillery game for the original Game Boy (DMG), inspired by the class
 
 ## TL;DR
 
-Download the latest release ROM from [bananas.gb](https://github.com/mdeclerk/Bananas/releases/latest) and run with [SameBoy](https://sameboy.github.io/).
+Download the latest release ROM [bananas.gb](https://github.com/mdeclerk/Bananas/releases/latest) and run with [SameBoy](https://sameboy.github.io/) or [mGBA](https://mgba.io/).
 
 
 ## Getting Started
