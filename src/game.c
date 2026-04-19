@@ -24,8 +24,8 @@ static void reset_round(game_t *self) {
                   vec2(0, 0),
                   vec2(self->terrain.size_px.x - SCREEN_W_PX,
                        self->terrain.size_px.y - SCREEN_H_PX));
-    player_round_reset(&self->players[0], &self->terrain);
-    player_round_reset(&self->players[1], &self->terrain);
+    player_reset_round(&self->players[0], &self->terrain);
+    player_reset_round(&self->players[1], &self->terrain);
     projectile_init(&self->projectile);
 
     self->active_player = 0;

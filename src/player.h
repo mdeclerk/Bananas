@@ -27,7 +27,7 @@ typedef struct {
 } player_t;
 
 void    player_init(player_t *self, player_type_t type);
-void    player_round_reset(player_t *self, const terrain_t *terrain);
+void    player_reset_round(player_t *self, const terrain_t *terrain);
 void    player_update_view(player_t *self, const viewport_t *viewport);
 void    player_adjust_aim(player_t *self, vec2_t delta);
 vec2_t  player_projectile_spawn(const player_t *self);

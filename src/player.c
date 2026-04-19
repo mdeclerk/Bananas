@@ -16,7 +16,7 @@ void player_init(player_t *self, player_type_t type) {
     self->type = type;
 }
 
-void player_round_reset(player_t *self, const terrain_t *terrain) {
+void player_reset_round(player_t *self, const terrain_t *terrain) {
     self->aim.x = (self->type == PLAYER_LEFT) ? PLAYER_START_AIM_REACH : -PLAYER_START_AIM_REACH;
     self->aim.y = -PLAYER_START_AIM_REACH;
     self->lives = PLAYER_START_LIVES;
