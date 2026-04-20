@@ -14,16 +14,21 @@ A 2-player artillery game for the original Game Boy (DMG), inspired by the class
 
 Download the latest release ROM [bananas.gb](https://github.com/mdeclerk/Bananas/releases/latest) and run with [SameBoy](https://sameboy.github.io/) or [mGBA](https://mgba.io/).
 
+## Prerequisites
 
-## Getting Started
+- Docker (containerized build environment)
+- [SameBoy](https://sameboy.github.io/) (GameBoy emulator)
+
+## Build environment
 
 ```sh
-./scripts/init.sh     # one-time Docker build env setup
-./scripts/build.sh    # compile → build/bananas.gb
-./scripts/play.sh     # launch SameBoy
+./scripts/init.sh             # one-time Docker build env setup
+./scripts/build.sh            # release build → build/bananas.gb
+./scripts/build.sh DEBUG=1    # debug build with .map + .sym/.noi symbols
+./scripts/play.sh             # launch SameBoy with build/bananas.gb
 ```
 
-All scripts are also available as VS Code tasks via **Terminal → Run Task** (Init, Build, Clean, Play, Build & Play).
+All scripts are also available as VS Code tasks via **Terminal → Run Task**.
 
 ## How to play
 
@@ -33,12 +38,7 @@ All scripts are also available as VS Code tasks via **Terminal → Run Task** (I
   <img src="docs/gameplay-subtitled.gif" alt="Gameplay demo" width="336">
 </p>
 
-## Prerequisites
-
-- Docker (containerized build environment)
-- [SameBoy](https://sameboy.github.io/) (GameBoy emulator)
-
-## Project Structure
+## Project Layout
 
 ```
 src/              Source code — gameplay, physics, rendering, input, sfx

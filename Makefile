@@ -17,6 +17,10 @@ HDRS := $(shell find $(SRC_DIR) -name '*.h') $(ASSET_HDRS)
 
 CPPFLAGS := -I$(BUILD_DIR)
 
+ifeq ($(DEBUG),1)
+CFLAGS += -Wa-l -Wl-j -Wl-m -Wm-yS
+endif
+
 PNG2ASSET_FLAGS := -keep_duplicate_tiles -no_palettes -map -bpp 2 -tiles_only -pack_mode gb -noflip -keep_palette_order
 
 all: $(ROM)
@@ -31,7 +35,7 @@ $(GEN_DIR)/%.c: $(ASSET_DIR)/%.png Makefile | $(GEN_DIR)
 $(GEN_DIR)/%.h: $(GEN_DIR)/%.c ;
 
 $(ROM): $(SRCS) $(HDRS) | $(BUILD_DIR)
-	$(CC) $(CPPFLAGS) -o $@ $(SRCS)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ $(SRCS)
 
 clean:
 	rm -rf $(BUILD_DIR)

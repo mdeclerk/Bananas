@@ -10,10 +10,18 @@
       "problemMatcher": []
     },
     {
-      "label": "Bananas: Build",
+      "label": "Bananas: Build (Release)",
       "type": "shell",
       "command": "${workspaceFolder}/scripts/build.sh",
       "group": { "kind": "build", "isDefault": true },
+      "presentation": { "reveal": "always", "panel": "shared" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Bananas: Build (Debug)",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/build.sh DEBUG=1",
+      "group": "build",
       "presentation": { "reveal": "always", "panel": "shared" },
       "problemMatcher": []
     },
@@ -34,9 +42,17 @@
       "problemMatcher": []
     },
     {
-      "label": "Bananas: Build & Play",
+      "label": "Bananas: Build (Release) & Play",
       "dependsOrder": "sequence",
-      "dependsOn": ["Bananas: Build", "Bananas: Play"],
+      "dependsOn": ["Bananas: Build (Release)", "Bananas: Play"],
+      "group": "test",
+      "presentation": { "reveal": "always", "panel": "shared" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Bananas: Build (Debug) & Play",
+      "dependsOrder": "sequence",
+      "dependsOn": ["Bananas: Build (Debug)", "Bananas: Play"],
       "group": "test",
       "presentation": { "reveal": "always", "panel": "shared" },
       "problemMatcher": []
