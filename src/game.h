@@ -35,6 +35,6 @@ typedef struct {
     uint8_t state_timer;
 } game_t;
 
-void game_loop(void);
+void game_loop(game_t *game);
 
 #endif

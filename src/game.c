@@ -198,27 +198,25 @@ static void update_state_pan_cam(game_t *self) {
     }
 }
 
-void game_loop(void) {
-    game_t game;
-
-    player_init(&game.players[0], PLAYER_LEFT);
-    player_init(&game.players[1], PLAYER_RIGHT);
+void game_loop(game_t *game) {
+    player_init(&game->players[0], PLAYER_LEFT);
+    player_init(&game->players[1], PLAYER_RIGHT);
     crosshair_init();
     statusbar_init();
     
-    reset_round(&game);
+    reset_round(game);
 
     for (;;) {
         vsync();
         input_update();
 
-        switch (game.state) {
-        case STATE_AIM:     update_state_aim(&game);     break;
-        case STATE_PEEK:    update_state_peek(&game);    break;
-        case STATE_FIRE:    update_state_fire(&game);    break;
-        case STATE_HIT:     update_state_hit(&game);     break;
-        case STATE_MISS:    update_state_miss(&game);    break;
-        case STATE_PAN_CAM: update_state_pan_cam(&game); break;
+        switch (game->state) {
+        case STATE_AIM:     update_state_aim(game);     break;
+        case STATE_PEEK:    update_state_peek(game);    break;
+        case STATE_FIRE:    update_state_fire(game);    break;
+        case STATE_HIT:     update_state_hit(game);     break;
+        case STATE_MISS:    update_state_miss(game);    break;
+        case STATE_PAN_CAM: update_state_pan_cam(game); break;
         }
     }
 }
