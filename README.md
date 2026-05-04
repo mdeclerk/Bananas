@@ -12,7 +12,7 @@ A 2-player artillery game for the original Game Boy (DMG), inspired by the class
 
 ## TL;DR
 
-Download the latest release ROM [bananas.gb](https://github.com/mdeclerk/Bananas/releases/latest) and run with [SameBoy](https://sameboy.github.io/) or [mGBA](https://mgba.io/).
+Download latest [release ROM](https://github.com/mdeclerk/Bananas/releases/tag/latest/), run with [SameBoy](https://sameboy.github.io/) or [mGBA](https://mgba.io/).
 
 ## Prerequisites
 

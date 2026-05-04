@@ -3,18 +3,56 @@ name: CI
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  build:
+  guard-main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require main branch
+        run: |
+          if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
+            echo "workflow_dispatch is only allowed on main; got ${GITHUB_REF}"
+            exit 1
+          fi
+
+  build-buildenv:
+    needs: guard-main
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
 
-      - name: Build Docker image (bananas-buildenv)
+      - name: Build Docker image
         run: bash scripts/init.sh
+
+      - name: Archive Docker image
+        run: |
+          set -euo pipefail
+          docker save bananas-buildenv | gzip > /tmp/bananas-buildenv.tar.gz
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: bananas-buildenv
+          path: /tmp/bananas-buildenv.tar.gz
+          retention-days: 1
+
+  build-release:
+    needs: build-buildenv
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: bananas-buildenv
+          path: /tmp
+
+      - name: Load Docker image
+        run: docker load < /tmp/bananas-buildenv.tar.gz
 
       - name: Compile ROM
         run: bash scripts/build.sh
@@ -27,12 +65,44 @@ jobs:
 
       - uses: actions/upload-artifact@v7
         with:
-          name: bananas-gb
+          name: bananas-release
           path: build/bananas.gb
 
-  release:
-    needs: build
-    if: github.ref == 'refs/heads/main'
+  build-debug:
+    needs: build-buildenv
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: bananas-buildenv
+          path: /tmp
+
+      - name: Load Docker image
+        run: docker load < /tmp/bananas-buildenv.tar.gz
+
+      - name: Compile debug ROM
+        run: bash scripts/build.sh DEBUG=1
+
+      - name: Verify debug artifacts
+        run: |
+          test -s build/bananas.gb
+          test -s build/bananas.sym
+          test -s build/bananas.map
+          test -s build/bananas.noi
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: bananas-debug
+          path: |
+            build/bananas.gb
+            build/bananas.sym
+            build/bananas.map
+            build/bananas.noi
+
+  publish:
+    needs: [build-release, build-debug]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -41,14 +111,26 @@ jobs:
 
       - uses: actions/download-artifact@v8
         with:
-          name: bananas-gb
-          path: build
+          name: bananas-release
+          path: build/release
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: bananas-debug
+          path: build/debug
+
+      - name: Package artifacts
+        run: |
+          zip bananas-release.zip -j build/release/*
+          zip bananas-debug.zip -j build/debug/*
 
       - name: Publish rolling "latest" release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release delete latest --yes --cleanup-tag 2>/dev/null || true
-          gh release create latest build/bananas.gb \
+          gh release create latest \
+            bananas-release.zip \
+            bananas-debug.zip \
             --title "Latest build" \
             --notes "Built from commit ${GITHUB_SHA::7} on $(date -u +%Y-%m-%d)"
