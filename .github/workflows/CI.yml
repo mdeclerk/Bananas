@@ -115,7 +115,7 @@ jobs:
       - name: Load Docker image
         run: docker load < /tmp/bananas-buildenv.tar.gz
 
-      - uses: prefix-dev/setup-pixi@v0.8.10
+      - uses: prefix-dev/setup-pixi@v0.9.4
         with:
           manifest-path: PyBananas/pyproject.toml
           cache: true
