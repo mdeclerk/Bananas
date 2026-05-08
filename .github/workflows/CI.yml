@@ -101,8 +101,47 @@ jobs:
             build/bananas.map
             build/bananas.noi
 
+  build-pybananas:
+    needs: build-buildenv
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: bananas-buildenv
+          path: /tmp
+
+      - name: Load Docker image
+        run: docker load < /tmp/bananas-buildenv.tar.gz
+
+      - uses: prefix-dev/setup-pixi@v0.8.10
+        with:
+          manifest-path: PyBananas/pyproject.toml
+          cache: true
+
+      - name: Build wheel
+        working-directory: PyBananas
+        run: pixi run build-wheel
+
+      - name: Run tests
+        working-directory: PyBananas
+        run: pixi run test
+
+      - name: Verify wheel bundles ROM
+        run: |
+          set -euo pipefail
+          wheel=$(ls PyBananas/dist/pybananas-*.whl | head -n1)
+          unzip -l "$wheel" | grep -q "pybananas/rom/bananas.gb"
+          unzip -l "$wheel" | grep -q "pybananas/rom/bananas.sym"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: pybananas-wheel
+          path: PyBananas/dist/*
+
   publish:
-    needs: [build-release, build-debug]
+    needs: [build-release, build-debug, build-pybananas]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -119,6 +158,11 @@ jobs:
           name: bananas-debug
           path: build/debug
 
+      - uses: actions/download-artifact@v8
+        with:
+          name: pybananas-wheel
+          path: build/pybananas
+
       - name: Package artifacts
         run: |
           zip bananas-release.zip -j build/release/*
@@ -132,5 +176,6 @@ jobs:
           gh release create latest \
             bananas-release.zip \
             bananas-debug.zip \
+            build/pybananas/* \
             --title "Latest build" \
             --notes "Built from commit ${GITHUB_SHA::7} on $(date -u +%Y-%m-%d)"

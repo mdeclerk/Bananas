@@ -2,7 +2,7 @@
 
 # Bananas
 
-A 2-player artillery game for the original Game Boy (DMG), inspired by the classic [Gorillas (1991)](https://en.wikipedia.org/wiki/Gorillas_(video_game)). Two kongs, destructible terrain with random layout, ballistic bananas.
+A 2-player artillery game for the original Game Boy (DMG), plus a Python wrapper [PyBananas](PyBananas/README.md) for AI/ML training. Inspired by the classic [Gorillas (1991)](https://en.wikipedia.org/wiki/Gorillas_(video_game)): two kongs, destructible randomized terrain, ballistic bananas.
 
 <p align="center">
   <img src="docs/image1.png" alt="Title screen" width="360">
@@ -18,6 +18,7 @@ Download latest [release ROM](https://github.com/mdeclerk/Bananas/releases/tag/l
 
 - Docker (containerized build environment)
 - [SameBoy](https://sameboy.github.io/) (GameBoy emulator)
+- [Pixi](https://pixi.sh/) (optional, for PyBananas development)
 
 ## Build environment
 
@@ -26,6 +27,7 @@ Download latest [release ROM](https://github.com/mdeclerk/Bananas/releases/tag/l
 ./scripts/build.sh            # release build → build/bananas.gb
 ./scripts/build.sh DEBUG=1    # debug build with .map + .sym/.noi symbols
 ./scripts/play.sh             # launch SameBoy with build/bananas.gb
+./scripts/clean.sh            # wipe build/ and PyBananas artifacts
 ```
 
 All scripts are also available as VS Code tasks via **Terminal → Run Task**.
@@ -46,7 +48,13 @@ assets/           PNG images (auto-converted to GB tile data by png2asset)
 build/
   bananas.gb      ROM output
   generated/      auto-generated source code
+PyBananas/        PyBoy-based Python wrapper for AI/ML training
+  dist/pybananas-(...).whl
 scripts/          build scripts
 Makefile          build rules + asset pipeline
 Dockerfile        GBDK build environment
 ```
+
+## PyBananas
+
+See [PyBananas](PyBananas/README.md)

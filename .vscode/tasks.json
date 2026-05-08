@@ -28,7 +28,15 @@
     {
       "label": "Bananas: Clean",
       "type": "shell",
-      "command": "${workspaceFolder}/scripts/build.sh clean",
+      "command": "${workspaceFolder}/scripts/clean.sh",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "shared" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Bananas: Build PyBananas Wheel",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/build-wheel.sh",
       "group": "build",
       "presentation": { "reveal": "always", "panel": "shared" },
       "problemMatcher": []
@@ -53,6 +61,33 @@
       "label": "Bananas: Build (Debug) & Play",
       "dependsOrder": "sequence",
       "dependsOn": ["Bananas: Build (Debug)", "Bananas: Play"],
+      "group": "test",
+      "presentation": { "reveal": "always", "panel": "shared" },
+      "problemMatcher": []
+    },
+    {
+      "label": "PyBananas: Build Wheel",
+      "type": "shell",
+      "command": "pixi run build-wheel",
+      "options": { "cwd": "${workspaceFolder}/PyBananas" },
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "shared" },
+      "problemMatcher": []
+    },
+    {
+      "label": "PyBananas: Play",
+      "type": "shell",
+      "command": "pixi run play",
+      "options": { "cwd": "${workspaceFolder}/PyBananas" },
+      "group": "test",
+      "presentation": { "reveal": "always", "panel": "shared" },
+      "problemMatcher": []
+    },
+    {
+      "label": "PyBananas: Test",
+      "type": "shell",
+      "command": "pixi run test",
+      "options": { "cwd": "${workspaceFolder}/PyBananas" },
       "group": "test",
       "presentation": { "reveal": "always", "panel": "shared" },
       "problemMatcher": []

@@ -1,0 +1,55 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pybananas"
+version = "0.1.0"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+dependencies = [
+    "pyboy>=2.7,<3",
+    "numpy>=2",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pybananas"]
+
+[tool.hatch.build]
+artifacts = [
+    "src/pybananas/rom/bananas.gb",
+    "src/pybananas/rom/bananas.sym",
+]
+
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["osx-arm64", "osx-64", "linux-64", "linux-aarch64", "win-64"]
+
+[tool.pixi.dependencies]
+python = ">=3.10,<3.14"
+pytest = ">=8"
+python-build = "*"
+hatchling = ">=1.25"
+
+[tool.pixi.pypi-dependencies]
+pyboy = ">=2.7,<3"
+pybananas = { path = ".", editable = true }
+
+[tool.pixi.tasks.build-rom]
+cmd = "bash ../scripts/build.sh DEBUG=1 BUILD_DIR=PyBananas/src/pybananas/rom"
+
+[tool.pixi.tasks.build-wheel]
+cmd = "python -m build --wheel --no-isolation"
+depends-on = ["build-rom"]
+
+[tool.pixi.tasks.clean-rom]
+cmd = "rm -rf src/pybananas/rom"
+
+[tool.pixi.tasks.play]
+cmd = "python -m pybananas"
+depends-on = ["build-rom"]
+
+[tool.pixi.tasks.test]
+cmd = "pytest -v"
+depends-on = ["build-rom"]
