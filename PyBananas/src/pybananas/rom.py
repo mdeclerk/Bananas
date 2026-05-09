@@ -33,7 +33,6 @@ BANANAS_ROM = Path(__file__).resolve().parent / "rom" / "bananas.gb"
 
 
 def validate_rom(rom: Path = BANANAS_ROM) -> Path:
-    """Validate ROM and .sym exist. Returns the rom path."""
     if not rom.exists():
         raise FileNotFoundError(
             f"ROM not found: {rom}\n"
@@ -49,7 +48,6 @@ def validate_rom(rom: Path = BANANAS_ROM) -> Path:
 
 
 def resolve_symbol(rom: Path, name: str) -> int:
-    """Look up `name` in the .sym file (`bank:addr name`)."""
     sym = rom.with_suffix(".sym")
     for line in sym.read_text().splitlines():
         parts = line.strip().split()

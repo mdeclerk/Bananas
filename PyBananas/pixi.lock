@@ -986,8 +986,8 @@ packages:
   timestamp: 1764896838868
 - pypi: ./
   name: pybananas
-  version: 0.1.0
-  sha256: 8128ea39c78bf94c8a95e5083852a7a1df6edee3d67ea668e06c33b7c8dc6da4
+  version: 0.1.1
+  sha256: c5d0f17dd8d0a4695fa8b756c9f1f82a4f58c32da3133189cbbfd23cc6039887
   requires_dist:
   - pyboy>=2.7,<3
   - numpy>=2

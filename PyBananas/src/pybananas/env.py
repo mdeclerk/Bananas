@@ -36,12 +36,12 @@ SETTLE_FRAMES = 10  # let DISPLAY_ON + PPU produce a full gameplay frame after A
 
 
 class BananasEnv:
-    """PyBoy wrapper for bananas.gb.
+    """Headless PyBoy environment for the Bananas ROM.
 
-    Observation: grayscale (144, 160) uint8 in [0, 3] (0 = lightest).
-    Action: a `GameInput` (preferred) or any length-8 bool/0-1 sequence over
-    (UP, DOWN, LEFT, RIGHT, A, B, START, SELECT).
-    Step: presses the action mask for `frame_skip` ticks, then releases it.
+    Observations are grayscale ``uint8`` arrays with shape ``(144, 160)`` and
+    values ``0..3`` where ``0`` is lightest. Actions are either ``GameInput``
+    values or length-8 bool/0-1 sequences in ``(UP, DOWN, LEFT, RIGHT, A, B,
+    START, SELECT)`` order.
     """
 
     def __init__(
@@ -54,6 +54,22 @@ class BananasEnv:
         sound: bool = False,
         no_input: bool = True,
     ) -> None:
+        """Create a Bananas environment.
+
+        Args:
+            rom_path: Optional path to a ``.gb`` ROM. Defaults to the packaged
+                Bananas ROM.
+            window: PyBoy window backend. Use ``"null"`` for headless training.
+            scale: Display scale used when a visible PyBoy window is enabled.
+            frame_skip: Emulator frames advanced by each ``step`` call.
+            skip_splash: If true, advance from the splash screen to gameplay.
+            sound: Whether PyBoy should emulate sound.
+            no_input: Whether PyBoy should ignore host keyboard input.
+
+        Raises:
+            FileNotFoundError: If the ROM or matching ``.sym`` file is missing.
+            ValueError: If ``frame_skip`` is less than 1.
+        """
         if rom_path is not None:
             rom = validate_rom(Path(rom_path))
         else:
@@ -91,10 +107,16 @@ class BananasEnv:
     # ------------------------------------------------------------------ core
 
     def reset(self) -> np.ndarray:
-        """Reload the boot state, idle a random number of frames on the splash
-        screen so the hardware DIV register varies, then press START.  The game
-        seeds its RNG from DIV_REG at the moment START is pressed, producing
-        unique terrain each episode."""
+        """Start a new randomized episode and return the first observation.
+
+        Reloads the boot state, idles for a random number of splash-screen
+        frames, then presses START. This varies the hardware DIV register used
+        by the game seed so terrain changes between episodes.
+
+        Returns:
+            Grayscale ``uint8`` observation with shape ``(144, 160)`` and
+            values ``0..3``.
+        """
         self._pyboy.load_state(io.BytesIO(self._boot_state))
         warmup = int(self._rng.integers(0, SPLASH_WARMUP_MAX))
         self._pyboy.tick(count=warmup, render=False)
@@ -103,6 +125,18 @@ class BananasEnv:
         return self.observe()
 
     def step(self, action) -> np.ndarray:
+        """Apply an action for one environment step.
+
+        Args:
+            action: ``GameInput`` or any length-8 bool/0-1 sequence in
+                ``(UP, DOWN, LEFT, RIGHT, A, B, START, SELECT)`` order.
+
+        Returns:
+            Next grayscale ``uint8`` observation with shape ``(144, 160)``.
+
+        Raises:
+            ValueError: If ``action`` is not a valid 8-button mask.
+        """
         mask = _action_mask(action)
         pressed = [name for bit, name in zip(mask, BUTTON_NAMES, strict=True) if bit]
         for name in pressed:
@@ -115,41 +149,63 @@ class BananasEnv:
         return self.observe()
 
     def observe(self) -> np.ndarray:
+        """Return the current frame without advancing the emulator.
+
+        Returns:
+            Grayscale ``uint8`` observation with shape ``(144, 160)`` and
+            values ``0..3``.
+        """
         return (255 - self._pyboy.screen.ndarray[..., 0]) >> 6
 
     # ---------------------------------------------------------------- state
 
     def game_state(self) -> GameState:
+        """Return the decoded game state from emulator memory."""
         return decode_game_state(self.g_game_bytes())
 
     def g_game_bytes(self) -> bytes:
+        """Return raw bytes for the ROM's ``g_game`` state struct."""
         return bytes(self._pyboy.memory[self._g_game_addr : self._g_game_addr + GAME_STATE_SIZE])
 
     @property
     def g_game_addr(self) -> int:
+        """Memory address of the ROM's ``g_game`` state struct."""
         return self._g_game_addr
 
     # ----------------------------------------------------------- emulation
 
     def tick(self, count: int = 1, render: bool = True) -> bool:
-        """Advance the emulator by *count* frames.
+        """Advance the emulator by ``count`` frames.
 
-        Returns ``False`` when the emulator window has been closed.
+        Args:
+            count: Number of emulator frames to advance.
+            render: Whether PyBoy should render frames while ticking.
+
+        Returns:
+            ``False`` when the emulator window has been closed, otherwise
+            ``True``.
         """
         return self._pyboy.tick(count=count, render=render)
 
     def set_emulation_speed(self, speed: int) -> None:
-        """Set the target emulation speed (1 = real-time, 0 = unlimited)."""
+        """Set target emulation speed.
+
+        Args:
+            speed: PyBoy speed multiplier. ``1`` is real-time; ``0`` is
+                unlimited.
+        """
         self._pyboy.set_emulation_speed(speed)
 
     # -------------------------------------------------------------- lifecycle
 
     def close(self) -> None:
+        """Stop the PyBoy emulator and release environment resources."""
         if self._pyboy is not None:
             self._pyboy.stop()
             self._pyboy = None  # type: ignore[assignment]
 
     def __enter__(self) -> BananasEnv:
+        """Return this environment for ``with`` statement use."""
         return self
 
     def __exit__(
@@ -158,6 +214,7 @@ class BananasEnv:
         exc: BaseException | None,
         tb: TracebackType | None,
     ) -> None:
+        """Close the environment when leaving a ``with`` block."""
         self.close()
 
 
@@ -166,7 +223,6 @@ class BananasEnv:
 
 
 def skip_through_splash(pyboy: PyBoy, g_game_addr: int) -> None:
-    """Pulse START until g_game.state == AIM and players[0].lives == 3."""
     for _ in range(0, SPLASH_MAX_FRAMES, 8):
         if _in_game(pyboy, g_game_addr):
             return

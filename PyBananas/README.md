@@ -2,15 +2,13 @@
 
 PyBananas is a Python wrapper of Bananas ROM for AI/ML training tasks.
 
-## Usage
-
-Install wheel packges:
+## Install PIP Wheel
 
 ```bash
-pip install https://github.com/mdeclerk/Bananas/releases/latest/download/pybananas-0.1.0-py3-none-any.whl
+pip install https://github.com/mdeclerk/Bananas/releases/latest/download/pybananas-0.1.1-py3-none-any.whl
 ```
 
-Use in code:
+## Quickstart
 
 ```python
 from pybananas import BananasEnv, GameInput, GameStateEnum
@@ -23,9 +21,26 @@ with BananasEnv() as env:
     print(f"P1: {state.players[0].score} pts, {state.players[0].lives} lives")
 ```
 
-## Pixi Build Workflow
+## PyBananas API
 
-Install [Pixi](https://pixi.sh) as dev environment and task runner.
+
+| API | Purpose |
+| --- | --- |
+| `BananasEnv(window="null", frame_skip=4, ...)` | Create a headless training environment. |
+| `env.reset()` | Start a randomized episode and return the first observation. |
+| `env.step(action)` | Apply `GameInput` or an 8-value button array and return the next observation. |
+| `env.observe()` | Read the current frame without stepping. |
+| `env.game_state()` | Read decoded scores, lives, terrain, projectile, and turn state. |
+| `env.tick(count=1, render=True)` | Manually advance emulator frames. |
+| `env.set_emulation_speed(speed)` | Set emulator speed; `0` means unlimited. |
+| `env.close()` | Stop the emulator. |
+
+Observations are grayscale `uint8` arrays with shape `(144, 160)` and values
+`0..3`. Action arrays use `(UP, DOWN, LEFT, RIGHT, A, B, START, SELECT)` order.
+
+## Pixi Build Environment
+
+Install [Pixi](https://pixi.sh) as dev environment and task runner for PyBananas.
 
 ```bash
 cd PyBananas

@@ -5,6 +5,8 @@ from enum import IntEnum
 
 
 class GameStateEnum(IntEnum):
+    """High-level game state decoded from the ROM."""
+
     AIM = 0
     PEEK = 1
     FIRE = 2
@@ -14,6 +16,8 @@ class GameStateEnum(IntEnum):
 
 
 class ProjectileStateEnum(IntEnum):
+    """Projectile lifecycle state decoded from the ROM."""
+
     NONE = 0
     FLYING = 1
     HIT_TERRAIN = 2
@@ -23,18 +27,24 @@ class ProjectileStateEnum(IntEnum):
 
 @dataclass(frozen=True, slots=True)
 class Vec2:
+    """Integer 2D position or size in pixels."""
+
     x: int
     y: int
 
 
 @dataclass(frozen=True, slots=True)
 class Vec2Fixed:
+    """Fixed-point 2D vector decoded from the ROM."""
+
     x: int
     y: int
 
 
 @dataclass(frozen=True, slots=True)
 class Viewport:
+    """Camera viewport state."""
+
     pos: Vec2
     target: Vec2
     min: Vec2
@@ -43,6 +53,8 @@ class Viewport:
 
 @dataclass(frozen=True, slots=True)
 class Terrain:
+    """Destructible terrain state."""
+
     heights: tuple[int, ...]
     plateau_count: int
     size_px: Vec2
@@ -52,6 +64,8 @@ class Terrain:
 
 @dataclass(frozen=True, slots=True)
 class Player:
+    """Player state for one kong."""
+
     type: int
     pos: Vec2
     aim: Vec2
@@ -62,6 +76,8 @@ class Player:
 
 @dataclass(frozen=True, slots=True)
 class Projectile:
+    """Active banana projectile state."""
+
     pos: Vec2Fixed
     vel: Vec2Fixed
     state: ProjectileStateEnum
@@ -70,6 +86,8 @@ class Projectile:
 
 @dataclass(frozen=True, slots=True)
 class GameState:
+    """Decoded snapshot of the complete game state."""
+
     viewport: Viewport
     terrain: Terrain
     players: tuple[Player, Player]

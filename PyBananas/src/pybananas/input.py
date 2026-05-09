@@ -1,5 +1,3 @@
-"""Button enum + GameInput: composable, named-button replacement for raw arrays."""
-
 from __future__ import annotations
 
 from dataclasses import dataclass, fields
@@ -16,6 +14,8 @@ ACTION_SIZE = len(BUTTON_NAMES)
 
 
 class Button(IntEnum):
+    """Game Boy controller button index used by action arrays."""
+
     UP = 0
     DOWN = 1
     LEFT = 2
@@ -32,11 +32,11 @@ class GameInput:
 
     Construct one of three ways:
 
-        GameInput()                                 # no buttons (alias: GameInput.NOOP)
-        GameInput(a=True, up=True)                  # kwargs
-        GameInput.A | GameInput.UP                  # combine named singletons
+        ``GameInput()``                       # no buttons
+        ``GameInput(a=True, up=True)``        # keyword flags
+        ``GameInput.A | GameInput.UP``        # combine named singletons
 
-    `BananasEnv.step` accepts both `GameInput` and raw 8-element arrays.
+    ``BananasEnv.step`` accepts both ``GameInput`` and raw 8-element arrays.
     """
 
     up: bool = False
@@ -61,7 +61,7 @@ class GameInput:
 
     @classmethod
     def from_buttons(cls, *buttons: Button) -> "GameInput":
-        """`GameInput.from_buttons(Button.A, Button.UP)`."""
+        """Create an input from one or more ``Button`` values."""
         kwargs: dict[str, bool] = {}
         for btn in buttons:
             kwargs[BUTTON_NAMES[Button(btn).value]] = True
@@ -69,7 +69,18 @@ class GameInput:
 
     @classmethod
     def from_array(cls, arr) -> "GameInput":
-        """Inverse of `to_array()`; accepts any 8-element bool/0-1 sequence."""
+        """Create an input from an 8-value button mask.
+
+        Args:
+            arr: Bool/0-1 sequence in ``(UP, DOWN, LEFT, RIGHT, A, B, START,
+                SELECT)`` order.
+
+        Returns:
+            Equivalent ``GameInput`` instance.
+
+        Raises:
+            ValueError: If ``arr`` is not a valid 8-button mask.
+        """
         a = np.asarray(arr)
         if a.shape != (ACTION_SIZE,):
             raise ValueError(f"expected shape ({ACTION_SIZE},), got {a.shape}")
@@ -78,19 +89,20 @@ class GameInput:
         return cls(**{name: bool(a[i]) for i, name in enumerate(BUTTON_NAMES)})
 
     def to_array(self) -> np.ndarray:
-        """Length-8 uint8 array in (UP, DOWN, LEFT, RIGHT, A, B, START, SELECT) order."""
+        """Return a length-8 ``uint8`` button mask in canonical button order."""
         return np.array(
             [getattr(self, name) for name in BUTTON_NAMES],
             dtype=np.uint8,
         )
 
     def pressed(self) -> tuple[Button, ...]:
-        """Buttons currently down, in canonical order."""
+        """Return pressed buttons in canonical button order."""
         return tuple(
             Button(i) for i, name in enumerate(BUTTON_NAMES) if getattr(self, name)
         )
 
     def __or__(self, other: "GameInput") -> "GameInput":
+        """Combine two button sets."""
         if not isinstance(other, GameInput):
             return NotImplemented
         return GameInput(
@@ -98,6 +110,7 @@ class GameInput:
         )
 
     def __iter__(self) -> Iterator[bool]:
+        """Iterate button states in canonical button order."""
         # Lets `np.asarray(game_input)` work transparently.
         return (getattr(self, name) for name in BUTTON_NAMES)
 

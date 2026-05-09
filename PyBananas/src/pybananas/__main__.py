@@ -1,5 +1,3 @@
-"""Open an interactive PyBoy window for playing Bananas."""
-
 from __future__ import annotations
 
 from .env import BananasEnv
